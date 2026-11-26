@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dental Kahn · Dentistas Asociados — propuesta de web</title>
+<meta name="description" content="Más de 35 años de experiencia en atención integral y personalizada. Odontología, nutrición, psicología y psiquiatría en San Borja, Lima.">
+<style>
+@font-face{font-family:"Cabin";font-weight:700;font-style:normal;font-display:swap;src:url(./assets/u-4x0qwljrw-pfu81xckcpdpbgzjl6xfpfed7ea9bixxkbqdh7al.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Cabin";font-weight:700;font-style:normal;font-display:swap;src:url(./assets/u-4x0qwljrw-pfu81xckcpdpbgzjl6xfpfed7ea9bixxkbqdh7il.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Lato";font-weight:400;font-style:normal;font-display:swap;src:url(./assets/nw-lato400.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Lato";font-weight:400;font-style:normal;font-display:swap;src:url(./assets/nw-lato400-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+:root{--navy:#1D1C6D;--navy-d:#12114a;--sky:#2B7BB9;--mist:#F3F3FC;--ink:#151515;--mute:#575757;--line:#dcdcee;--serif:Georgia,"Iowan Old Style","Times New Roman",serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Lato",Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.65;font-size:17px;-webkit-font-smoothing:antialiased}
+img{height:auto;max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:"Cabin",Arial,sans-serif;font-weight:700;color:var(--navy);margin:0;line-height:1.12}
+.hero .wrap>*,.areas>*,.porque>*,.vis>*,.stack>*{min-width:0}
+h1,h2,h3,p,li{overflow-wrap:break-word}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+.aviso{background:var(--navy-d);color:#dcdcf5;font-size:13px;letter-spacing:.3px;padding:9px 0}
+.aviso .wrap{display:flex;gap:10px 22px;justify-content:space-between;flex-wrap:wrap}
+.aviso a{color:#fff;text-underline-offset:3px}
+header.top{background:#fff;border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:16px;padding-bottom:16px}
+.logo img{width:210px}
+nav.menu{display:flex;gap:22px;white-space:nowrap;font-size:12px;letter-spacing:2px;text-transform:uppercase}
+nav.menu a{text-decoration:none;padding:6px 0;border-bottom:1px solid transparent}
+nav.menu a:hover{border-color:var(--navy)}
+.btn{display:inline-block;font-family:"Cabin",Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:2.4px;text-transform:uppercase;text-decoration:none;background:var(--navy);color:#f5f5f5;padding:17px 28px;border:0;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--navy-d)}
+.btn.ghost{background:transparent;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.btn.ghost:hover{background:var(--mist)}
+.btn.sm{padding:12px 18px;font-size:12px;white-space:nowrap}
+.hero{background:var(--mist);overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding-top:72px;padding-bottom:72px}
+.eyebrow{font-size:12.5px;letter-spacing:3px;text-transform:uppercase;color:var(--sky);margin:0 0 20px;font-weight:400}
+.hero h1{font-size:clamp(38px,5.2vw,64px);text-transform:uppercase;letter-spacing:1px;line-height:1.06}
+.hero h1 em{font-family:var(--serif);font-style:italic;font-weight:400;text-transform:none;letter-spacing:0;color:var(--sky)}
+.hero p.lead{font-size:19px;color:#2c2c55;max-width:34em;margin:26px 0 34px}
+.hero .cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.hero .tel{font-size:14px;color:var(--mute)}
+.hero .tel a{color:var(--navy);text-underline-offset:3px}
+.arco{position:relative;justify-self:center;width:min(100%,440px)}
+.arco::before{content:"";position:absolute;inset:-18px -18px auto auto;width:78%;aspect-ratio:1;border-radius:50%;background:var(--navy);z-index:0}
+.arco .foto{position:relative;z-index:1;aspect-ratio:4/5;border-radius:999px 999px 0 0;overflow:hidden;background:#fff}
+.arco img{width:100%;height:100%;object-fit:cover;object-position:34% 50%}
+.arco .sello{position:absolute;z-index:2;left:-26px;bottom:26px;background:#fff;padding:16px 20px;box-shadow:0 14px 34px rgba(29,28,109,.16);font-family:"Cabin",Arial,sans-serif;font-weight:700;color:var(--navy);font-size:15px;line-height:1.25}
+.arco .sello b{display:block;font-size:34px;line-height:1}
+section{padding:92px 0}
+.head{max-width:700px;margin-bottom:48px}
+.head h2{font-size:clamp(28px,3.4vw,42px)}
+.head p{color:var(--mute);margin:16px 0 0}
+.areas{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}
+.card{border:1px solid var(--line);padding:38px;background:#fff}
+.card.dark{background:var(--navy);border-color:var(--navy);color:#e6e6fa}
+.card.dark h3{color:#fff}
+.card h3{font-size:28px}
+.card .tag{font-size:12px;letter-spacing:2.6px;text-transform:uppercase;color:var(--sky);margin-bottom:12px}
+.card.dark .tag{color:#9fc7ea}
+.card p{margin:14px 0 0}
+.stack{display:grid;gap:20px}
+.espec{list-style:none;padding:0;margin:24px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px 28px;font-size:15.5px}
+.espec li{padding:9px 0;border-bottom:1px solid var(--line)}
+.sub{background:var(--mist)}
+.esp{display:grid;grid-template-columns:repeat(2,1fr);gap:0 56px}
+.esp article{padding:26px 0;border-top:1.5px solid var(--navy)}
+.esp h3{font-size:22px;margin-bottom:10px}
+.esp p{margin:0;color:#3a3a4d;font-size:16px}
+.porque{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:start}
+.porque .foto{position:relative}
+.porque .foto img{width:100%;aspect-ratio:3/2.4;object-fit:cover}
+.porque .foto span{display:block;font-size:13px;color:var(--mute);margin-top:10px}
+.bigtxt{font-family:var(--serif);font-size:clamp(22px,2.4vw,29px);line-height:1.4;color:var(--navy);margin:0 0 28px}
+.pts{list-style:none;padding:0;margin:0;display:grid;gap:0}
+.pts li{padding:16px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:150px 1fr;gap:16px}
+.pts li:last-child{border-bottom:1px solid var(--line)}
+.pts b{font-family:"Cabin",Arial,sans-serif;color:var(--navy)}
+.wa{background:var(--navy);color:#e6e6fa}
+.wa h2{color:#fff}
+.wa .head p{color:#c9c9ee}
+.pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:0;counter-reset:p}
+.pasos div{padding:30px 30px 34px;border-left:1px solid rgba(255,255,255,.25)}
+.pasos div:first-child{border-left:0;padding-left:0}
+.pasos .n{font-family:var(--serif);font-style:italic;font-size:46px;line-height:1;color:#9fc7ea;display:block;margin-bottom:14px}
+.pasos h3{color:#fff;font-size:21px;margin-bottom:8px}
+.pasos p{margin:0;color:#d4d4f2;font-size:16px}
+.wa .go{margin-top:44px}
+.btn.inv{background:#fff;color:var(--navy)}
+.btn.inv:hover{background:var(--mist)}
+.faq{max-width:820px}
+details{border-top:1px solid var(--line);padding:0}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:22px 40px 22px 0;font-family:"Cabin",Arial,sans-serif;font-weight:700;color:var(--navy);font-size:19px;position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:26px;font-weight:400;color:var(--sky)}
+details[open] summary::after{content:"–"}
+details p{margin:0 0 24px;color:#3a3a4d;max-width:44em}
+.vis{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.vis dl{margin:0;display:grid;gap:22px}
+.vis dt{font-size:12px;letter-spacing:2.6px;text-transform:uppercase;color:var(--sky)}
+.vis dd{margin:4px 0 0;font-size:18px}
+.vis dd a{text-underline-offset:3px;color:var(--navy)}
+.vis .box{background:var(--mist);padding:38px}
+.vis .box p{margin:12px 0 26px;color:#3a3a4d}
+footer{background:var(--navy-d);color:#c9c9ee;font-size:14px;padding:34px 0}
+footer .wrap{display:flex;justify-content:space-between;gap:12px 28px;flex-wrap:wrap}
+footer a{color:#fff;text-underline-offset:3px}
+a:focus-visible,summary:focus-visible,.btn:focus-visible{outline:3px solid #2B7BB9;outline-offset:3px}
+@media(max-width:900px){
+ nav.menu{display:none}
+ .hero .wrap,.areas,.porque,.vis{grid-template-columns:1fr}
+ .hero .wrap{padding-top:44px;gap:48px}
+ .esp{grid-template-columns:1fr}
+ .pasos{grid-template-columns:1fr}
+ .pasos div{border-left:0;border-top:1px solid rgba(255,255,255,.25);padding-left:0}
+ .pasos div:first-child{border-top:0}
+ section{padding:64px 0}
+ .arco{width:min(86%,380px)}
+ .arco .sello{left:-10px}
+}
+@media(max-width:520px){
+ .wrap{padding:0 20px}
+ .logo img{width:160px}
+ header.top .btn{padding:12px 14px;font-size:11px;letter-spacing:1.6px}
+ .card{padding:26px}.espec{grid-template-columns:1fr}
+ .pts li{grid-template-columns:1fr;gap:2px}
+ .hero .cta .btn{width:100%;text-align:center}
+ .hero h1{font-size:34px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="aviso"><div class="wrap"><span>Propuesta de diseño — versión de muestra preparada por IJV</span><a href="/">Ver su web actual</a></div></div>
+
+<header class="top"><div class="wrap">
+ <a class="logo" href="#inicio" aria-label="Dental Kahn, Dentistas Asociados"><img src="./assets/nw-logo.png" alt="Dental Kahn · Dentistas Asociados" width="210" height="72"></a>
+ <nav class="menu" aria-label="Principal">
+  <a href="#areas">Áreas</a><a href="#servicios">Servicios</a><a href="#nosotros">Quiénes somos</a><a href="#agendar">Agendar</a><a href="#preguntas">Preguntas</a><a href="#contacto">Contacto</a>
+ </nav>
+ <a class="btn sm" href="#agendar" onclick="window.ijvOpenChat&&window.ijvOpenChat();return false;">Agendar por WhatsApp</a>
+</div></header>
+
+<main id="inicio">
+<div class="hero"><div class="wrap">
+ <div>
+  <p class="eyebrow">Dentistas Asociados · San Borja</p>
+  <h1>Trabajando juntos por su <em>salud</em></h1>
+  <p class="lead">Más de 35 años de experiencia en atención integral y personalizada, con un equipo de especialistas y una moderna infraestructura. Hoy también en nutrición, psicología y psiquiatría.</p>
+  <div class="cta">
+   <a class="btn" href="#agendar" onclick="window.ijvOpenChat&&window.ijvOpenChat();return false;">Agendar por WhatsApp</a>
+   <span class="tel">o llámenos al <a href="tel:+5114353055">(01) 435 3055</a></span>
+  </div>
+ </div>
+ <div class="arco">
+  <div class="foto"><img src="./assets/nw-sonrisa.jpg" alt="Primer plano de una sonrisa y un espejo dental" width="1504" height="1000"></div>
+  <div class="sello"><b>35+</b>años de<br>experiencia</div>
+ </div>
+</div></div>
+
+<section id="areas"><div class="wrap">
+ <div class="head"><p class="eyebrow">Un centro de salud integral</p><h2>Cuatro áreas para el cuidado completo de nuestros pacientes</h2></div>
+ <div class="areas">
+  <div class="card">
+   <div class="tag">Odontología</div>
+   <h3>Resolvemos sus necesidades odontológicas</h3>
+   <p>Atención de especialistas en cada rama de la odontología, con el acompañamiento de un mismo equipo.</p>
+   <ul class="espec">
+    <li>Rehabilitación oral y estética dental</li><li>Ortodoncia y ortopedia dentomaxilar</li><li>Endodoncia</li><li>Periodoncia e implantes dentales</li><li>Oclusión y disfunción temporomandibular</li><li>Odontopediatría</li><li>Cirugía bucal / maxilofacial</li>
+   </ul>
+  </div>
+  <div class="stack">
+   <div class="card dark">
+    <div class="tag">Nutrición</div>
+    <h3>Alimentación y salud bucal</h3>
+    <p>Una alimentación adecuada fortalece dientes y encías, previene caries y mejora la recuperación en tratamientos odontológicos.</p>
+   </div>
+   <div class="card">
+    <div class="tag">Psicología · Psiquiatría</div>
+    <h3>Salud mental, parte del bienestar</h3>
+    <p>Apoyo psicológico y atención psiquiátrica que complementan la odontología, ayudando a manejar la ansiedad y el estrés, y a reforzar la confianza y el autocuidado.</p>
+   </div>
+  </div>
+ </div>
+</div></section>
+
+<section id="servicios" class="sub"><div class="wrap">
+ <div class="head"><p class="eyebrow">Servicios</p><h2>Especialidades odontológicas</h2></div>
+ <div class="esp">
+  <article><h3>Rehabilitación oral y estética dental</h3><p>Trata la ausencia de piezas dentarias: devuelve la anatomía, la función y la estética al sistema dentario, fijando coronas unitarias o múltiples a dientes.</p></article>
+  <article><h3>Ortodoncia y ortopedia dentomaxilar</h3><p>Trabaja en la corrección y prevención de anomalías causadas por irregularidades en los maxilares.</p></article>
+  <article><h3>Endodoncia</h3><p>El tratamiento de conductos consiste en la limpieza, descontaminación y relleno de la cámara pulpar y sus conductos, para luego restaurar el diente.</p></article>
+  <article><h3>Periodoncia e implantes dentales</h3><p>Prevención, diagnóstico y tratamiento de enfermedades como la gingivitis o la periodontitis.</p></article>
+  <article><h3>Oclusión y disfunción temporomandibular</h3><p>Aborda los problemas de dolor y función del sistema masticatorio que pueden producirse a raíz del bruxismo o de problemas de la mordida.</p></article>
+  <article><h3>Odontopediatría</h3><p>Es importante que la primera atención de un niño la realice un especialista en niños.</p></article>
+  <article><h3>Cirugía bucal / maxilofacial</h3><p>Incluye extracción de molares del juicio, colocación de implantes, diagnóstico de quistes, tumores y otras patologías de tejidos duros y blandos, y su tratamiento.</p></article>
+  <article><h3>Nutrición, psicología y psiquiatría</h3><p>Las áreas que ampliaron nuestra propuesta para el cuidado completo del paciente.</p></article>
+ </div>
+</div></section>
+
+<section id="nosotros"><div class="wrap porque">
+ <div class="foto"><img src="./assets/nw-sala.jpg" alt="Sala de espera de Dental Kahn" width="1023" height="681"><span>Nuestra sede en Cavallini 296, San Borja.</span></div>
+ <div>
+  <p class="eyebrow">Quiénes somos</p>
+  <p class="bigtxt">Dental Kahn es una institución de salud con más de 35 años de experiencia, dedicada a brindar atención integral y personalizada.</p>
+  <ul class="pts">
+   <li><b>Equipo</b><span>Especialistas, junto a una moderna infraestructura.</span></li>
+   <li><b>Servicio</b><span>Ético, exclusivo y de alta calidad.</span></li>
+   <li><b>Prevención</b><span>La odontología moderna se basa en prevenir: recomendamos controles cada seis meses.</span></li>
+   <li><b>Su cita</b><span>Para brindarle una mejor atención, le agradecemos agendar con anticipación.</span></li>
+  </ul>
+ </div>
+</div></section>
+
+<section id="agendar" class="wa"><div class="wrap">
+ <div class="head"><p class="eyebrow" style="color:#9fc7ea">Agendar su cita</p><h2>Escríbanos por WhatsApp, en tres pasos</h2><p>Le respondemos al instante, las 24 horas, con nuestro asistente virtual.</p></div>
+ <div class="pasos">
+  <div><span class="n">1</span><h3>Escriba cuando le convenga</h3><p>A cualquier hora, desde el mismo WhatsApp que ya usa.</p></div>
+  <div><span class="n">2</span><h3>Nuestro asistente le atiende</h3><p>Le pregunta lo necesario, de a una consulta por vez, y le ofrece turnos disponibles.</p></div>
+  <div><span class="n">3</span><h3>Su cita queda anotada</h3><p>Nuestro equipo recibe sus datos y la confirmación llega por el mismo chat.</p></div>
+ </div>
+ <div class="go"><a class="btn inv" href="#agendar" onclick="window.ijvOpenChat&&window.ijvOpenChat();return false;">Agendar por WhatsApp</a></div>
+</div></section>
+
+<section id="preguntas"><div class="wrap">
+ <div class="head"><p class="eyebrow">Preguntas frecuentes</p><h2>Lo que más nos consultan</h2></div>
+ <div class="faq">
+  <details><summary>No tengo dentista. ¿Qué hago?</summary><p>En Dental Kahn contamos con profesionales altamente calificados en todas las especialidades odontológicas, brindando atención integral y de calidad. La odontología moderna se basa en la prevención, por eso recomendamos controles cada seis meses. Si tiene dudas sobre qué especialista consultar, contáctenos y con gusto le orientaremos.</p></details>
+  <details><summary>¿Qué es el bruxismo y cómo se trata?</summary><p>Es el hábito de rechinar o apretar los dientes, muchas veces causado por estrés. Se trata con férulas de descarga y acompañamiento psicológico si es necesario.</p></details>
+  <details><summary>¿Cada cuánto debo hacerme una limpieza dental profesional?</summary><p>Recomendamos al menos una vez cada seis meses, para prevenir caries y gingivitis y mantener una sonrisa saludable.</p></details>
+  <details><summary>¿A qué edad es recomendable la primera visita al odontólogo?</summary><p>Nuestros especialistas recomiendan llevar a los niños desde los 6 meses, cuando aparecen los primeros dientes. A esa edad ya es posible detectar malformaciones o problemas que puedan afectar su salud dental a futuro.</p></details>
+  <details><summary>¿Cuál es la diferencia entre ortodoncia tradicional y estética?</summary><p>La tradicional utiliza brackets metálicos, efectivos pero más visibles. La estética emplea opciones más discretas, como brackets de porcelana o alineadores transparentes (Invisalign), con la misma eficacia y una apariencia más estética y cómoda.</p></details>
+  <details><summary>¿La alimentación influye en la salud dental?</summary><p>Sí. Una dieta balanceada fortalece dientes y encías, y reduce el riesgo de caries y enfermedades periodontales.</p></details>
+  <details><summary>¿La ansiedad puede afectar mi salud bucal?</summary><p>Sí. El estrés y la ansiedad pueden generar bruxismo, sequedad bucal y otros problemas.</p></details>
+ </div>
+</div></section>
+
+<section id="contacto" class="sub"><div class="wrap vis">
+ <div>
+  <div class="head" style="margin-bottom:30px"><p class="eyebrow">Visítenos o contáctenos</p><h2>Estamos en San Borja</h2></div>
+  <dl>
+   <div><dt>Dirección</dt><dd>Cavallini 296, San Borja 15037, Lima, Perú</dd></div>
+   <div><dt>Teléfonos</dt><dd><a href="tel:+5114353055">(01) 435 3055</a> · <a href="tel:+5114353361">(01) 435 3361</a> · <a href="tel:+51944977747">944 977 747</a></dd></div>
+   <div><dt>Correo</dt><dd><a href="mailto:info@dentalkahn.com.pe">info@dentalkahn.com.pe</a></dd></div>
+   <div><dt>Horario</dt><dd>8:00 a. m. – 7:00 p. m.</dd></div>
+   <div><dt>Aceptamos</dt><dd>Efectivo, Visa, MasterCard, American Express, transferencia electrónica y depósito bancario</dd></div>
+  </dl>
+ </div>
+ <div class="box">
+  <h3 style="font-size:28px">¿Prefiere escribirnos?</h3>
+  <p>Nos encanta recibir a nuestros pacientes. Escríbanos por WhatsApp y le ayudamos a elegir fecha y especialista.</p>
+  <a class="btn" href="#agendar" onclick="window.ijvOpenChat&&window.ijvOpenChat();return false;">Agendar por WhatsApp</a>
+ </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+ <span>© Dental Kahn · Dentistas Asociados. Todos los derechos reservados.</span>
+ <a href="/politica-privacidad">Política de privacidad</a>
+</div></footer>
+</body>
+</html>

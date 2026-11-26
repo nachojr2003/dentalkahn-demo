@@ -1,0 +1,327 @@
+<!doctype html>
+<!--
+  CRM de recepción — Dental Kahn (demo IJV Agency). Un archivo, HTML+JS vanilla, sin dependencias externas.
+  Molde: demo-nakamine/site/panel.html. Lectura en vivo (solo GET) del endpoint dentalkahn-demo-panel.
+  Forma: {ok,generado,leads:[{lead_id,session_id,nombre,telefono,calificacion(Nuevo|Paciente),resumen,estado,programado_para,creado}]}
+  resumen = 6.º campo del marcador: <Nuevo|Paciente>; Motivo: …; Servicio: …; Doctor: …; Origen: …; Celular: …; nota
+            (en alerta_enviada/pending puede venir "Calificación: <texto> | <último mensaje>"). Falta una etiqueta -> «—».
+  estado: borrador|draft -> Datos completos · alerta_enviada|pending -> Cita por confirmar · confirmada|verified -> Cita confirmada · rechazada|rejected -> Descartado
+  ?vista=hoy|recordatorios|nuevos|seguimientos|direccion · ?mock=1 solo ejemplos (sin red) · ?fake=1 filas falsas en vivo · ?incluir_pruebas=1
+  Todo lo marcado EJEMPLO / MAQUETA / PROPUESTA son datos simulados. Sin DNI, correo ni datos de pago.
+-->
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1D1C6D">
+<title>CRM Dental Kahn</title>
+<style>
+@font-face{font-family:'Lato';font-weight:400;font-display:swap;src:url(./assets/lato400.woff2) format('woff2')}
+@font-face{font-family:'Lato';font-weight:700;font-display:swap;src:url(./assets/s6u_w4bmutphjxsi5wq_fqft1dw.woff2) format('woff2')}
+@font-face{font-family:'Cabin';font-weight:700;font-display:swap;src:url(./assets/u-4x0qwljrw-pfu81xckcpdpbgzjl6xfpfed7ea9bixxkbqdh7al.woff2) format('woff2');unicode-range:U+0100-02AF,U+1E00-1EFF,U+20A0-20CF,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Cabin';font-weight:700;font-display:swap;src:url(./assets/u-4x0qwljrw-pfu81xckcpdpbgzjl6xfpfed7ea9bixxkbqdh7il.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{--navy:#1D1C6D;--navy-d:#12114f;--navy-50:#F3F3FC;--navy-100:#E1E1F6;--ink:#151515;--txt:#262626;--mut:#5c5c70;--line:#d9d9e8;--line2:#ececf5;--bg:#f6f6fb;--card:#fff;
+--ok:#1E7A46;--ok-50:#E3F3EA;--amb:#B97800;--amb-50:#FFF1CF;--red:#B3261E;--red-50:#FCE8E6;--gray-50:#eeeef5;
+--f-ui:'Lato',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;--f-h:'Cabin','Lato',system-ui,Arial,sans-serif;--r:12px;--sh:0 1px 2px rgba(20,20,80,.08),0 8px 22px -16px rgba(20,20,80,.4)}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 var(--f-ui);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+h1,h2,h3{font-family:var(--f-h);margin:0;color:var(--ink);font-weight:700}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1300px;margin:0 auto;padding:0 16px}
+header.top{background:var(--navy);color:#fff}
+header.top .wrap{display:flex;align-items:center;gap:14px;padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
+.logo{background:#fff;border-radius:8px;padding:5px 10px;display:flex;align-items:center;min-height:38px}
+.logo img{height:28px;width:auto;display:block}
+.logo b{font:700 1rem var(--f-h);color:var(--navy);letter-spacing:.5px}
+header.top h1{color:#fff;font-size:1.08rem;flex:1;min-width:160px}
+header.top h1 small{display:block;font:400 .76rem var(--f-ui);color:#c9c9ee}
+.live-st{font-size:.8rem;display:flex;align-items:center;gap:6px;color:#e4e4ff}
+.dot{width:9px;height:9px;border-radius:50%;background:#99a;display:inline-block}.dot.on{background:#3ddc84;box-shadow:0 0 0 3px rgba(61,220,132,.25)}.dot.off{background:#f0a020}
+.hbtn{background:transparent;border:1px solid #8c8cd0;color:#fff;border-radius:8px;padding:6px 12px;font-size:.82rem}.hbtn:hover{border-color:#fff}
+.strip{background:var(--navy-d);color:#dcdcff;font-size:.8rem}.strip .wrap{padding-top:6px;padding-bottom:6px;overflow-wrap:anywhere}.strip b{color:#fff}
+nav.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto}
+nav.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px;font:700 .9rem var(--f-h);color:var(--mut);white-space:nowrap}
+nav.tabs button .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--gray-50);font:700 .72rem var(--f-ui);color:var(--txt);text-align:center}
+nav.tabs button[aria-selected=true]{color:var(--navy);border-bottom-color:var(--navy)}nav.tabs button[aria-selected=true] .n{background:var(--navy-100);color:var(--navy)}
+.hoy{background:#fff;border-bottom:1px solid var(--line)}
+.hoy summary{max-width:1300px;margin:0 auto;padding-left:16px!important;padding-right:16px!important;list-style:none;cursor:pointer;padding:9px 0;display:flex;gap:10px;align-items:center;font:700 .9rem var(--f-h);color:var(--navy)}
+.hoy summary::-webkit-details-marker{display:none}.hoy summary::after{content:'▾';margin-left:auto;color:var(--mut)}.hoy[open] summary::after{content:'▴'}
+.hoy-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;padding-bottom:8px}
+.hoy-g div{background:var(--navy-50);border-radius:10px;padding:8px 10px}.hoy-g b{display:block;font:700 1.2rem var(--f-h);color:var(--navy)}.hoy-g span{font-size:.76rem;color:var(--mut)}
+.hoy p{margin:0 0 10px;font-size:.78rem;color:var(--mut)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 10px}
+.bar input[type=search]{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;min-width:0;flex:1}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 12px;font-weight:700;font-size:.84rem;white-space:nowrap}.btn:hover{border-color:var(--navy)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}.btn.sm{padding:4px 9px;font-size:.78rem}
+.chip{display:inline-block;font:700 .7rem var(--f-ui);padding:2px 8px;border-radius:20px;background:var(--gray-50);color:var(--txt);white-space:nowrap}
+.c-ok{background:var(--ok-50);color:var(--ok)}.c-amb{background:var(--amb-50);color:#6b4a00}.c-nav{background:var(--navy-100);color:var(--navy)}
+.c-call{background:var(--red);color:#fff}.c-live{background:var(--ok-50);color:var(--ok)}.c-ex{background:var(--gray-50);color:var(--mut);font-weight:400}.c-mk{background:var(--amb-50);color:#6b4a00;border:1px dashed #d4a017}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:12px 14px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:12px}
+h2.sec{font-size:1.05rem;margin:18px 0 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--navy)}h2.sec small{font:400 .78rem var(--f-ui);color:var(--mut)}
+.note{background:var(--amb-50);border:1px dashed #d4a017;border-radius:10px;padding:9px 12px;font-size:.82rem;margin:0 0 12px}
+.note.nv{background:var(--navy-50);border-color:#a9a9e0}
+.empty{padding:22px;text-align:center;color:var(--mut);background:#fff;border:1px dashed var(--line);border-radius:var(--r)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}.kpi b{display:block;font:700 1.4rem var(--f-h);color:var(--navy)}.kpi span{font-size:.78rem;color:var(--mut)}
+.kpi.call{border-color:var(--red);background:var(--red-50)}.kpi.call b{color:var(--red)}
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r)}
+table.t{width:100%;border-collapse:collapse;font-size:.85rem}table.t th,table.t td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2);vertical-align:top}
+table.t th{font-size:.7rem;text-transform:uppercase;color:var(--mut);letter-spacing:.05em;background:var(--navy-50);white-space:nowrap}
+tr.llamar td{background:var(--red-50)}tr.llamar td:first-child{box-shadow:inset 4px 0 var(--red)}
+.ft{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:10px 0;padding:10px;background:var(--navy-50);border-radius:9px}
+.ft dt{font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin:0}.ft dd{margin:0;font-weight:700;overflow-wrap:anywhere}.ft dd.na{color:#999;font-weight:400}.ft .w{grid-column:1/-1}
+.ch{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;align-items:flex-start}.ch h3{font-size:1rem}.sub{font-size:.76rem;color:var(--mut)}
+.msg{background:#DCF8C6;border-radius:4px 12px 12px 12px;padding:8px 11px;font-size:.85rem;white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0}
+.tl{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}.tq{border:1px solid var(--line);border-radius:9px;padding:5px 8px;font-size:.76rem;background:#fff}.tq b{display:block;font-size:.8rem}
+.tq.env{background:var(--ok-50);border-color:#9bd1b0}.tq.det{background:var(--gray-50);color:#888}
+.bars{display:grid;gap:7px;margin-top:8px}.br{display:grid;grid-template-columns:minmax(100px,170px) 1fr auto;gap:8px;align-items:center;font-size:.84rem}
+.br .t{height:16px;background:var(--gray-50);border-radius:8px;overflow:hidden}.br .t i{display:block;height:100%;background:var(--navy);border-radius:8px;min-width:2px}.br .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-bottom:12px}
+.cost{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}.cost div{background:var(--navy-50);border-radius:10px;padding:8px 10px}.cost b{display:block;font:700 1.15rem var(--f-h);color:var(--navy)}.cost span{font-size:.76rem;color:var(--mut)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;font-size:.84rem;z-index:80;max-width:92vw;display:none}.toast.on{display:block}
+footer{padding:20px 0 40px;font-size:.78rem;color:var(--mut)}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.tl{grid-template-columns:1fr}.br{grid-template-columns:90px 1fr auto}header.top h1{font-size:1rem}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="logo"><img id="lg" src="/assets/logo.png" alt="Dental Kahn"></div>
+  <h1>Recepción · Dental Kahn <small>Demo de IJV Agency · lo que el asistente deja listo para su recepción</small></h1>
+  <div class="live-st" id="liveSt" aria-live="polite"><span class="dot"></span><span>Conectando…</span></div>
+  <button class="hbtn" id="bRefresh" type="button">Actualizar</button>
+  <button class="hbtn" id="bCsv" type="button">Exportar CSV</button>
+</div></header>
+<div class="strip"><div class="wrap"><b>Sincronización con Dentalink — PROPUESTA</b> (no conectado en esta demo). Lo marcado <b>EJEMPLO</b>, <b>MAQUETA</b> o <b>PROPUESTA</b> son datos simulados.</div></div>
+<details class="hoy" id="hoyBand" open><summary>Su clínica hoy</summary><div class="wrap">
+  <div class="hoy-g">
+    <div><b>6</b><span>odontólogos</span></div><div><b>1</b><span>persona en recepción</span></div>
+    <div><b>~1,000</b><span>recordatorios al mes</span></div><div><b>25–30</b><span>pacientes por día</span></div>
+    <div><b>30–40</b><span>contactos por día</span></div><div><b>35+</b><span>años de trayectoria</span></div>
+  </div>
+  <p>Cifras de la clínica según la conversación del diagnóstico. Esta demo muestra cómo podría repartirse ese trabajo; no promete resultados.</p>
+</div></details>
+<nav class="tabs"><div class="wrap" id="tabs" role="tablist"></div></nav>
+<main class="wrap" id="main"></main>
+<footer><div class="wrap">Demo de IJV Agency · datos de ejemplo salvo lo marcado «EN VIVO» · sin DNI, correo ni datos de pago.</div></footer>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+'use strict';
+var ENDPOINT='https://meta.ijvagency.com/web'+'hook/dentalkahn-demo-panel';
+var Q=new URLSearchParams(location.search),MOCK=Q.get('mock')==='1',FAKE=Q.get('fake')==='1',PRUEBAS=Q.get('incluir_pruebas')==='1';
+var LS='dentalkahn_crm_v1',LSU='dentalkahn_crm_ui',LIMA=-5*3600*1000,D='—';
+var MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],DIAS=['dom','lun','mar','mié','jue','vie','sáb'];
+var VISTAS=[{id:'hoy',n:'Hoy'},{id:'recordatorios',n:'Recordatorios'},{id:'nuevos',n:'Pacientes nuevos'},{id:'seguimientos',n:'Seguimientos'},{id:'direccion',n:'Dirección'}];
+var DOCS=['Dr. Willy Moreno','Odontólogo/a 2','Odontólogo/a 3','Odontólogo/a 4','Odontólogo/a 5','Odontólogo/a 6'];
+function $(s,r){return (r||document).querySelector(s);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+function digits(s){return String(s||'').replace(/\D/g,'');}
+function pad(n){return n<10?'0'+n:''+n;}
+function clean(s){return String(s==null?'':s).replace(/[\u0000-\u001f\u007f]+/g,' ').trim();}
+function lp(ms){var d=new Date(ms+LIMA);return {d:d.getUTCDate(),m:d.getUTCMonth(),h:d.getUTCHours(),mi:d.getUTCMinutes(),wd:d.getUTCDay()};}
+function fmtDT(ms){var p=lp(ms);return DIAS[p.wd]+' '+p.d+' '+MESES[p.m]+', '+pad(p.h)+':'+pad(p.mi);}
+function ago(ms){var m=Math.max(1,Math.round((Date.now()-ms)/60000));if(m<60)return 'hace '+m+' min';var h=Math.round(m/60);if(h<48)return 'hace '+h+' h';return 'hace '+Math.round(h/24)+' d';}
+function fmtTel(t){var d=digits(t);if(d.length===11&&d.indexOf('51')===0)d=d.slice(2);if(d.length===9)return d.slice(0,3)+' '+d.slice(3,6)+' '+d.slice(6);return d||'Sin número';}
+function rLS(k,f){try{var r=localStorage.getItem(k);if(r){var o=JSON.parse(r);if(o&&typeof o==='object')return o;}}catch(e){}return f;}
+function wLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function sinSec(s){return String(s||'').replace(/\b\d{12,}\b/g,'[dato oculto]');}
+function toast(h){var t=$('#toast');t.innerHTML=h;t.className='toast on';clearTimeout(toast.t);toast.t=setTimeout(function(){t.className='toast';},3500);}
+
+/* ---------- Parser del marcador ---------- */
+var CL={motivo:'motivo',servicio:'servicio',doctor:'doctor',origen:'origen',celular:'cel',calificacion:'cal'};
+function parseRes(txt){
+  var t=String(txt||''),bar=t.indexOf('|'),head=bar>-1?t.slice(0,bar):t,msg=bar>-1?t.slice(bar+1):'',o={},notas=[];
+  head.split(';').forEach(function(seg){
+    var s=seg.trim();if(!s)return;
+    if(!o.tipo&&/^(nuevo|paciente)\.?$/i.test(s)){o.tipo=/^n/i.test(s)?'Nuevo':'Paciente';return;}
+    var m=s.match(/^([^:]{2,24}?)\s*:\s*([\s\S]+)$/),k=m?CL[norm(m[1]).replace(/[^a-z ]/g,'').trim()]:null;
+    if(k==='cal'){var mm=m[2].match(/nuevo|paciente/i);if(mm&&!o.tipo)o.tipo=/^n/i.test(mm[0])?'Nuevo':'Paciente';else if(!mm)notas.push(clean(m[2]));}
+    else if(k)o[k]=clean(m[2]);else notas.push(s.replace(/^nota\s*:\s*/i,''));
+  });
+  o.nota=notas.join('. ').trim();o.msg=clean(msg);return o;
+}
+function vv(v){v=clean(v);return (!v||/^(sin dato|-|—)$/i.test(v))?D:v.slice(0,80);}
+function parseProg(v){var s=clean(v);if(!s)return '';var m=s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);if(m)return fmtDT(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5])-LIMA);return s.slice(0,80);}
+var EST={draft:'draft',borrador:'draft',pending:'pending',alerta_enviada:'pending',verified:'verified',confirmada:'verified',rejected:'rejected',rechazada:'rejected'};
+var ESTN={draft:['Datos completos','c-amb'],pending:['Cita por confirmar','c-nav'],verified:['Cita confirmada','c-ok'],rejected:['Descartado','']};
+function normLive(r){
+  if(!r||typeof r!=='object')return null;var sid=clean(r.session_id);
+  if(!PRUEBAS&&/^(ijv-smoke|eval_|ensayo_|qa-|panel-check|smoke-demo|sim-)/i.test(sid))return null;
+  var id=sid||clean(r.lead_id);if(!id)return null;
+  var P=parseRes(sinSec(clean(r.resumen)).slice(0,700)),tipo=P.tipo||(/paciente/i.test(r.calificacion)?'Paciente':/nuevo/i.test(r.calificacion)?'Nuevo':D);
+  var est=EST[clean(r.estado).toLowerCase()]||'draft',cr=Date.parse(r.creado);
+  return {id:id,origen:'en vivo',nombre:clean(r.nombre)||'Sin nombre',tel:fmtTel(r.telefono),tipo:tipo,motivo:vv(P.motivo),servicio:vv(P.servicio),doctor:vv(P.doctor),orig:vv(P.origen),cel:vv(P.cel),nota:P.nota,msg:P.msg,est:est,turno:parseProg(r.programado_para),creado:isNaN(cr)?Date.now():cr};
+}
+/* ---------- Datos de EJEMPLO ---------- */
+var NOM=['Rosa','Luis','Carmen','Jorge','Elena','Pedro','Marta','Raúl','Sofía','Iván','Lucía','Hugo','Paula','Diego','Gloria','Andrés','Teresa','Mario','Julia','Óscar','Nora','Félix','Irma','Saúl','Clara','Pablo'];
+var APE=['Ejemplo','Demo','Ficticio','Muestra'];
+var HORAS=['08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','15:00','15:30','16:00','16:30','17:00','17:30'];
+var SERV=['Control y limpieza','Evaluación odontológica','Control y limpieza','Consulta de nutrición','Consulta de psicología','Tratamiento en curso','Control y limpieza','Consulta de psiquiatría'];
+function pac(i){return NOM[i%NOM.length]+' '+APE[i%APE.length]+' '+String.fromCharCode(65+(i*7)%26)+'.';}
+function buildHoy(){
+  var st=['conf','conf','conf','conf','reprog','conf','conf','nores','conf','conf','conf','canc','conf','conf','nores','conf','conf','reprog','conf','conf','nores','conf','conf','reprog','canc','nores'],out=[];
+  for(var i=0;i<26;i++)out.push({id:'ex-hoy-'+i,hora:HORAS[Math.floor(i*HORAS.length/26)],pac:pac(i),doc:DOCS[i%6],serv:SERV[i%SERV.length],tel:'9'+pad(10+i)+' 000 '+pad(100+i).slice(-3),st:st[i]});
+  out.sort(function(a,b){return a.hora<b.hora?-1:a.hora>b.hora?1:0;});return out;
+}
+var HOYST={conf:['Confirmó por WhatsApp','c-ok'],reprog:['Reprogramó','c-nav'],canc:['Canceló','c-amb'],nores:['Sin respuesta → llamar','c-call']};
+var PLANT={
+  manana:'Dental Kahn: Estimado(a) Sr./Sra. [Nombre], le recordamos su cita de mañana [día] a las [hora] con [Doctor]. ¿Nos confirma su asistencia?  [Confirmo] [Reprogramar] [Cancelar]',
+  control:'Dental Kahn: Estimado(a) Sr./Sra. [Nombre], ya le toca su control y limpieza semestral. ¿Le agendamos una cita?  [Sí, agendar] [Más adelante]'};
+var QST=['Programado','Enviado','Leído','Respondió','Agendó'],QCLS=['','c-ex','c-nav','c-amb','c-ok'];
+function buildCola(){
+  var out=[],i,tipos=['Cita de mañana','Cita de mañana','Control 6 meses','Control anual'],ests=[0,1,2,2,3,4,1,3,4,2,0,1,3,4,2,1,0,3,4,2];
+  for(i=0;i<20;i++){var t=tipos[i%4];out.push({id:'ex-q-'+i,pac:pac(i+30),tipo:t,doc:DOCS[(i+2)%6],cuando:t==='Cita de mañana'?'mañana '+HORAS[(i*3)%HORAS.length]:'control vencido',st:ests[i]});}
+  return out;
+}
+var SEGS=['Presupuesto de tratamiento sin iniciar','No volvió tras su control','Presupuesto de tratamiento sin iniciar','No volvió tras su última cita','Tratamiento interrumpido'];
+function buildSeg(){
+  var out=[],dias=[1,3,7,2,5,9,1,4,8,12],i;
+  for(i=0;i<30;i++){var d=[1,3,7][i%3],tocados=i%3,det=(i%10===9);
+    out.push({id:'ex-seg-'+i,pac:pac(i+60),motivo:SEGS[i%SEGS.length],doc:DOCS[(i+1)%6],dias:dias[i%10]+i%4*2,tocados:tocados,siguiente:d,det:det});}
+  return out;
+}
+function msgSeg(s){
+  var n=s.pac.split(' ')[0];
+  if(s.siguiente===1)return 'Dental Kahn: Estimado(a) Sr./Sra. '+n+', le escribimos para saber si desea retomar su atención. ¿Le agendamos una cita? Con gusto le ayudamos.';
+  if(s.siguiente===3)return 'Dental Kahn: Sr./Sra. '+n+', quedamos atentos por si desea reservar su cita. Puede responder a este mensaje cuando le convenga.';
+  return 'Dental Kahn: Sr./Sra. '+n+', este es nuestro último aviso por este medio. Si más adelante desea atenderse, estaremos encantados de recibirle.';
+}
+var EXN=[
+ {id:'ex-n-1',nombre:'Prueba Ejemplo Uno',tel:'900 000 101',tipo:'Nuevo',motivo:'Evaluación general',servicio:'Evaluación odontológica (paciente nuevo)',doctor:'Dr. Willy Moreno',orig:'Consulta',cel:'el mismo de WhatsApp',est:'pending',turno:'jue 26 nov, 15:00',nota:'prefiere tarde',msg:''},
+ {id:'ex-n-2',nombre:'Prueba Ejemplo Dos',tel:'900 000 102',tipo:'Paciente',motivo:'Control semestral',servicio:'Control y limpieza',doctor:'Equipo',orig:'Recordatorio',cel:'el mismo de WhatsApp',est:'verified',turno:'vie 27 nov, 10:00',nota:'',msg:''},
+ {id:'ex-n-3',nombre:'Prueba Ejemplo Tres',tel:'900 000 103',tipo:'Nuevo',motivo:'Consulta de nutrición',servicio:'Consulta de nutrición',doctor:'Equipo',orig:'Consulta',cel:'900 000 103',est:'draft',turno:'',nota:'',msg:''},
+ {id:'ex-n-4',nombre:'Prueba Ejemplo Cuatro',tel:'900 000 104',tipo:'Paciente',motivo:'Dolor fuerte',servicio:'Urgencia dental',doctor:'Equipo',orig:'Urgencia',cel:'el mismo de WhatsApp',est:'pending',turno:'primer turno',nota:'se le dio el teléfono de la clínica',msg:''}].map(function(x){x.origen='ejemplo';x.creado=Date.now()-3600000*(+x.id.slice(-1));return x;});
+function fakeResp(n){var now=Date.now(),L=[
+ {lead_id:'CIERRE-F1',session_id:'web_fake1',nombre:'Prueba En Vivo Uno',telefono:'900000901',calificacion:'Nuevo',resumen:'Calificación: Nuevo; Motivo: Dolor de muela; Servicio: Evaluación odontológica (paciente nuevo); Doctor: Dr. Willy Moreno; Origen: Consulta; Celular: el mismo de WhatsApp; prefiere mañana | Quisiera una cita con el doctor Willy',estado:'alerta_enviada',programado_para:'',creado:new Date(now-5*60000).toISOString()},
+ {lead_id:'CIERRE-F2',session_id:'web_fake2',nombre:'Prueba En Vivo Dos',telefono:'900000902',calificacion:'Paciente',resumen:'Paciente; Motivo: Control semestral; Servicio: Control y limpieza; Doctor: Equipo; Origen: Recordatorio; Celular: 900000902; ok',estado:'confirmada',programado_para:'2026-11-27 11:00',creado:new Date(now-2*3600000).toISOString()},
+ {lead_id:'BORRADOR-F3',session_id:'web_fake3',nombre:'Prueba En Vivo Tres',telefono:'900000903',calificacion:'Nuevo',resumen:'Nuevo; Motivo: Consulta de psicología; Servicio: Consulta de psicología',estado:'borrador',creado:new Date(now-26*3600000).toISOString()}];
+ if(n>=2)L.push({lead_id:'BORRADOR-F4',session_id:'web_fake4',nombre:'Prueba En Vivo Cuatro',telefono:'900000904',calificacion:'Paciente',resumen:'Paciente; Motivo: Reprogramar; Servicio: Reprogramación de cita; Origen: Reprogramación',estado:'borrador',creado:new Date(now-60000).toISOString()});
+ L.push({lead_id:'X',session_id:'eval_x',nombre:'Prueba interna',resumen:'Nuevo',estado:'borrador'});
+ return {ok:true,generado:new Date().toISOString(),leads:L};}
+
+var UI=rLS(LSU,{});
+var S={hoy:buildHoy(),cola:buildCola(),seg:buildSeg(),live:[],liveOk:MOCK?'mock':null,liveAt:0,fakeN:0,seen:null,local:rLS(LS,{}),vista:'hoy',q:'',ej:UI.ej!==false};
+var VQ=Q.get('vista');S.vista=VISTAS.some(function(v){return v.id===VQ;})?VQ:(VISTAS.some(function(v){return v.id===UI.vista;})?UI.vista:'hoy');
+function saveLocal(){wLS(LS,S.local);}
+function nuevos(){
+  var seen={},out=[];
+  S.live.concat(S.ej||MOCK?EXN:[]).forEach(function(b){if(seen[b.id])return;seen[b.id]=1;var l={},k;for(k in b)l[k]=b[k];var L=S.local[b.id]||{};if(L.confirmada)l.est='verified';out.push(l);});
+  return out;
+}
+function pull(){
+  if(MOCK){render();return Promise.resolve();}
+  var p;
+  if(FAKE)p=new Promise(function(res){setTimeout(function(){res(fakeResp(++S.fakeN));},120);});
+  else{var ctl=('AbortController' in window)?new AbortController():null,t=setTimeout(function(){if(ctl)ctl.abort();},8000);
+    p=fetch(ENDPOINT+(PRUEBAS?'?incluir_pruebas=1':''),{headers:{'Accept':'application/json'},cache:'no-store',signal:ctl?ctl.signal:undefined}).then(function(r){clearTimeout(t);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});}
+  return p.then(function(data){
+    if(!data||data.ok!==true||!Array.isArray(data.leads))throw new Error('formato');
+    var list=data.leads.map(function(r){try{return normLive(r);}catch(e){return null;}}).filter(Boolean),ids={};
+    list.forEach(function(l){ids[l.id]=1;});
+    if(S.seen)list.forEach(function(l){if(!S.seen[l.id])toast('Paciente nuevo <b>EN VIVO</b>: '+esc(l.nombre));});
+    S.seen=ids;S.live=list;S.liveOk=true;S.liveAt=Date.now();
+  }).catch(function(){S.liveOk=false;}).then(render);
+}
+/* ---------- Vistas ---------- */
+function tag(t){return '<span class="chip c-mk">'+t+'</span>';}
+function cnt(a,k,v){return a.filter(function(x){return x[k]===v;}).length;}
+function vHoy(){
+  var h=S.hoy,q=norm(S.q);if(q)h=h.filter(function(c){return norm(c.pac+' '+c.doc+' '+c.serv).indexOf(q)>-1;});
+  var nr=cnt(S.hoy,'st','nores');
+  var k='<div class="kpis"><div class="kpi"><b>'+S.hoy.length+'</b><span>citas de hoy</span></div><div class="kpi"><b>'+cnt(S.hoy,'st','conf')+'</b><span>confirmaron por WhatsApp</span></div><div class="kpi"><b>'+cnt(S.hoy,'st','reprog')+'</b><span>reprogramaron</span></div><div class="kpi"><b>'+cnt(S.hoy,'st','canc')+'</b><span>cancelaron</span></div><div class="kpi call"><b>'+nr+'</b><span>sin respuesta → llamar (lo único que queda para recepción)</span></div></div>';
+  var rows=h.map(function(c){var s=HOYST[c.st];return '<tr class="'+(c.st==='nores'?'llamar':'')+'"><td><b>'+c.hora+'</b></td><td>'+esc(c.pac)+'</td><td>'+esc(c.doc)+'</td><td>'+esc(c.serv)+'</td><td>'+(c.st==='nores'?'<b>'+c.tel+'</b>':'<span class="sub">—</span>')+'</td><td><span class="chip '+s[1]+'">'+s[0]+'</span></td></tr>';}).join('');
+  return '<h2 class="sec">Agenda del día '+tag('EJEMPLO')+'<small>26 citas simuladas entre 6 odontólogos; nombres ficticios</small></h2><div class="note nv">Los recordatorios de ayer ya se enviaron solos. La recepcionista solo atiende la fila marcada en rojo.</div>'+k+
+   '<div class="tw"><table class="t"><thead><tr><th>Hora</th><th>Paciente</th><th>Odontólogo</th><th>Motivo</th><th>Teléfono</th><th>Recordatorio</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="sub">Sin resultados.</td></tr>')+'</tbody></table></div>';
+}
+function vRec(){
+  var c=S.cola,q=norm(S.q);if(q)c=c.filter(function(x){return norm(x.pac+' '+x.tipo+' '+x.doc).indexOf(q)>-1;});
+  var rows=c.map(function(x){return '<tr><td>'+esc(x.pac)+'</td><td>'+esc(x.tipo)+'</td><td>'+esc(x.doc)+'</td><td>'+esc(x.cuando)+'</td><td><span class="chip '+QCLS[x.st]+'">'+QST[x.st]+'</span></td></tr>';}).join('');
+  var cuenta=QST.map(function(n,i){return n+': <b>'+cnt(S.cola,'st',i)+'</b>';}).join(' · ');
+  return '<h2 class="sec">Cola automática de recordatorios '+tag('MAQUETA')+'<small>citas de mañana (a diario) + controles de 6 meses / anuales (~45 por día hábil)</small></h2>'+
+  '<div class="note nv">Hoy esto lo escribe a mano una sola persona, unas 1,000 veces al mes. Aquí saldría solo y las respuestas llegarían ya clasificadas.</div>'+
+  '<div class="row2"><div class="card"><h3>Plantilla: cita de mañana</h3><div class="msg">'+esc(PLANT.manana)+'</div><h3 style="margin-top:10px">Plantilla: control semestral</h3><div class="msg">'+esc(PLANT.control)+'</div><div class="sub">Plantillas de WhatsApp de utilidad, envío automático.</div></div>'+
+  '<div class="card"><h3>Costo estimado de Meta '+tag('estimado')+'</h3><div class="cost"><div><b>≈ US$ 30</b><span>~1,000 recordatorios/mes × US$ 0.03</span></div><div><b>≈ US$ 18</b><span>~600 confirmaciones diarias × US$ 0.03</span></div><div><b>≈ US$ 48</b><span>total mensual estimado</span></div></div><div class="sub">Estimado, tarifa Meta nov-2026 (plantilla de utilidad, Perú). Puede variar; no incluye el servicio de IJV.</div></div></div>'+
+  '<p class="sub">'+cuenta+' (muestra de 20 envíos)</p><div class="tw"><table class="t"><thead><tr><th>Paciente</th><th>Tipo</th><th>Odontólogo</th><th>Cuándo</th><th>Estado</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function fichaN(l){
+  var f=[['Tipo',l.tipo],['Motivo',l.motivo],['Servicio',l.servicio],['Doctor',l.doctor],['Origen',l.orig],['Celular',l.cel&&l.cel!==D?l.cel:l.tel],['Cita',l.turno||'Sin turno elegido']];
+  return '<dl class="ft">'+f.map(function(x,i){return '<div'+(i===1?' class="w"':'')+'><dt>'+x[0]+'</dt><dd'+((!x[1]||x[1]===D)?' class="na"':'')+'>'+esc(x[1]||D)+'</dd></div>';}).join('')+'</dl>';
+}
+function cardN(l){
+  var e=ESTN[l.est]||ESTN.draft,L=S.local[l.id]||{};
+  return '<article class="card"><div class="ch"><div><h3>'+esc(l.nombre)+'</h3><div class="sub">'+esc(l.tel)+' · '+ago(l.creado)+'</div></div><div><span class="chip '+(l.origen==='en vivo'?'c-live':'c-ex')+'">'+(l.origen==='en vivo'?'EN VIVO':'ejemplo')+'</span> <span class="chip '+e[1]+'">'+e[0]+'</span></div></div>'+fichaN(l)+
+  (l.nota?'<div class="sub">Nota: '+esc(l.nota)+'</div>':'')+(l.msg?'<div class="sub">Último mensaje: «'+esc(l.msg)+'»</div>':'')+
+  '<div style="margin-top:8px">'+(l.est==='pending'||l.est==='draft'?'<button class="btn ok sm" data-conf="'+esc(l.id)+'" type="button">Confirmar cita</button>':'<span class="sub">'+(L.confirmada?'Confirmada por recepción (solo en este navegador)':'')+'</span>')+'</div></article>';
+}
+function vNuevos(){
+  var q=norm(S.q),all=nuevos().filter(function(l){return !q||norm([l.nombre,l.motivo,l.servicio,l.doctor].join(' ')).indexOf(q)>-1;});
+  var vivos=all.filter(function(l){return l.origen==='en vivo';}).sort(function(a,b){return b.creado-a.creado;}),ej=all.filter(function(l){return l.origen==='ejemplo';});
+  var aviso=S.liveOk===false?'<div class="note">Aún no hay conexión con los datos en vivo (o el servicio no respondió). Se muestran solo los ejemplos de abajo.</div>':(S.liveOk===true&&!vivos.length?'<div class="note nv">Todavía no hay pacientes nuevos en vivo. Cuando alguien converse con el asistente en el simulador y deje sus datos, aparecerá aquí en segundos.</div>':'');
+  return '<h2 class="sec">Pacientes nuevos <span class="chip c-live">EN VIVO</span><small>lo que el asistente registra en la conversación</small></h2>'+aviso+
+   (vivos.length?'<div class="grid">'+vivos.map(cardN).join('')+'</div>':(S.liveOk===null?'<div class="empty">Conectando…</div>':''))+
+   '<h2 class="sec">Ejemplos '+tag('EJEMPLO')+'<small>así se vería con más movimiento</small></h2>'+(ej.length?'<div class="grid">'+ej.map(cardN).join('')+'</div>':'<div class="empty">Ejemplos ocultos.</div>');
+}
+function vSeg(){
+  var q=norm(S.q),s=S.seg.filter(function(x){return !q||norm(x.pac+' '+x.motivo).indexOf(q)>-1;});
+  return '<h2 class="sec">Seguimientos '+tag('MAQUETA')+'<small>tratamientos presupuestados sin iniciar y pacientes que no volvieron (~30)</small></h2>'+
+  '<div class="note nv">Máximo 3 mensajes por paciente: día 1, día 3 y día 7. Después se detiene solo, para cuidar el trato y el número de WhatsApp de la clínica.</div><div class="grid">'+
+  s.map(function(x){var tl=[1,3,7].map(function(d,i){var c=i<x.tocados?'env':(x.det?'det':'');return '<div class="tq '+c+'"><b>Día '+d+'</b>'+(i<x.tocados?'enviado':(x.det?'detenido':'programado'))+'</div>';}).join('');
+   return '<article class="card"><div class="ch"><div><h3>'+esc(x.pac)+'</h3><div class="sub">'+esc(x.motivo)+' · '+esc(x.doc)+' · hace '+x.dias+' d</div></div><span class="chip c-ex">ejemplo</span></div><div class="tl">'+tl+'</div>'+(x.det?'<div class="sub">Respondió que no desea más mensajes: seguimiento detenido.</div>':'<div class="sub">Próximo mensaje (día '+x.siguiente+'):</div><div class="msg">'+esc(msgSeg(x))+'</div>')+'</article>';}).join('')+'</div>';
+}
+function bars(items,max){return '<div class="bars">'+items.map(function(i){return '<div class="br"><span class="l">'+esc(i[0])+'</span><span class="t"><i style="width:'+Math.round(i[1]/max*100)+'%"></i></span><b>'+i[1]+'</b></div>';}).join('')+'</div>';}
+function vDir(){
+  var cit=[22,19,24,21,18,20],conf=[88,91,85,90,87,92],ev=[3,2,4,3,2,3],tot=cit.reduce(function(a,b){return a+b;},0);
+  var avg=Math.round(conf.reduce(function(a,b){return a+b;},0)/6),evt=ev.reduce(function(a,b){return a+b;},0);
+  var tbl=DOCS.map(function(d,i){return '<tr><td>'+d+'</td><td>'+cit[i]+'</td><td>'+conf[i]+'%</td><td>'+ev[i]+'</td></tr>';}).join('');
+  var nv=nuevos().filter(function(l){return l.origen==='en vivo';}).length;
+  return '<h2 class="sec">Dirección '+tag('EJEMPLO')+'<small>lo que vería el Dr. Willy desde donde esté · datos simulados</small></h2>'+
+  '<div class="kpis"><div class="kpi"><b>'+tot+'</b><span>citas de la semana</span></div><div class="kpi"><b>'+avg+'%</b><span>confirmación (promedio)</span></div><div class="kpi"><b>'+evt+'</b><span>inasistencias evitadas al reprogramar a tiempo</span></div><div class="kpi"><b>38</b><span>controles vencidos por recordar</span></div><div class="kpi"><b>'+nv+'</b><span>pacientes nuevos EN VIVO en esta sesión</span></div></div>'+
+  '<div class="row2"><div class="card"><h3>Citas de la semana por odontólogo</h3><div class="tw" style="border:0"><table class="t"><thead><tr><th>Odontólogo</th><th>Citas</th><th>Confirmación</th><th>Evitadas</th></tr></thead><tbody>'+tbl+'</tbody></table></div></div>'+
+  '<div class="card"><h3>Pacientes nuevos por canal (mes)</h3>'+bars([['WhatsApp',14],['Página web',7],['Instagram',3]],14)+'<div class="sub" style="margin-top:8px">Ejemplo. Instagram hoy está sin uso; se muestra como posibilidad.</div></div></div>'+
+  '<div class="card"><h3>Carga de recepción '+tag('PROPUESTA')+'</h3>'+bars([['Contactos/día hoy (a mano)',35],['Quedarían por llamar',5]],35)+'<div class="sub" style="margin-top:8px">Referencia: 30–40 contactos diarios según la clínica; el resto es un estimado de ejemplo, no un resultado prometido.</div></div>';
+}
+/* ---------- Render ---------- */
+function render(){
+  var nn=nuevos().filter(function(l){return l.origen==='en vivo';}).length;
+  $('#tabs').innerHTML=VISTAS.map(function(v){var n=v.id==='hoy'?cnt(S.hoy,'st','nores'):v.id==='nuevos'?nn:v.id==='seguimientos'?S.seg.length:v.id==='recordatorios'?S.cola.length:'';return '<button role="tab" type="button" data-v="'+v.id+'" aria-selected="'+(S.vista===v.id)+'">'+v.n+(n!==''?'<span class="n">'+n+'</span>':'')+'</button>';}).join('');
+  var bar='<div class="bar"><input id="fq" type="search" placeholder="Buscar paciente, odontólogo, motivo…" value="'+esc(S.q)+'" aria-label="Buscar">'+(S.vista==='nuevos'?'<label class="sub"><input type="checkbox" id="fej"'+(S.ej?' checked':'')+'> mostrar ejemplos</label>':'')+'</div>';
+  var f={hoy:vHoy,recordatorios:vRec,nuevos:vNuevos,seguimientos:vSeg,direccion:vDir}[S.vista];
+  var focus=document.activeElement&&document.activeElement.id==='fq';
+  $('#main').innerHTML=(S.vista==='direccion'?'':bar)+f();
+  if(focus){var el=$('#fq');if(el){el.focus();var v=el.value;el.value='';el.value=v;}}
+  var st=$('#liveSt');
+  if(S.liveOk==='mock')st.innerHTML='<span class="dot off"></span><span>Modo ejemplos (?mock=1)</span>';
+  else if(S.liveOk===true)st.innerHTML='<span class="dot on"></span><span>En vivo · '+ago(S.liveAt)+'</span>';
+  else if(S.liveOk===false)st.innerHTML='<span class="dot off"></span><span>Sin datos en vivo todavía</span>';
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-v],[data-conf],#bRefresh,#bCsv');if(!t)return;
+  if(t.dataset.v){S.vista=t.dataset.v;S.q='';UI.vista=S.vista;wLS(LSU,UI);try{var p=new URLSearchParams(location.search);p.set('vista',S.vista);history.replaceState(null,'','?'+p.toString());}catch(x){}render();return;}
+  if(t.dataset.conf){var L=S.local[t.dataset.conf]||(S.local[t.dataset.conf]={});L.confirmada=true;saveLocal();toast('Cita marcada como confirmada (solo en este navegador)');render();return;}
+  if(t.id==='bRefresh'){pull().then(function(){toast('Actualizado');});return;}
+  if(t.id==='bCsv')csv();
+});
+document.addEventListener('input',function(e){if(e.target.id==='fq'){S.q=e.target.value;render();}});
+document.addEventListener('change',function(e){if(e.target.id==='fej'){S.ej=e.target.checked;UI.ej=S.ej;wLS(LSU,UI);render();}});
+function cc(v){v=String(v==null?'':v);if(/^[=+\-@]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"';}
+function csv(){
+  var cols=['Origen','Paciente','Teléfono','Tipo','Motivo','Servicio','Doctor','Origen del contacto','Celular','Estado','Cita','Nota'];
+  var rows=nuevos().map(function(l){return [l.origen,l.nombre,l.tel,l.tipo,l.motivo,l.servicio,l.doctor,l.orig,l.cel,(ESTN[l.est]||ESTN.draft)[0],l.turno,l.nota].map(cc).join(',');});
+  var blob=new Blob(['﻿'+cols.map(cc).join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dentalkahn-pacientes-nuevos.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);toast('CSV exportado ('+rows.length+' filas)');
+}
+var lg=$('#lg');function lgFail(){lg.parentNode.innerHTML='<b>DENTAL KAHN</b>';}
+lg.onerror=lgFail;if(lg.complete&&lg.naturalWidth===0)lgFail();
+if(window.matchMedia&&matchMedia('(max-width:640px)').matches)$('#hoyBand').removeAttribute('open');
+render();pull();
+if(!MOCK&&!FAKE)setInterval(pull,30000);
+})();
+</script>
+</body>
+</html>
